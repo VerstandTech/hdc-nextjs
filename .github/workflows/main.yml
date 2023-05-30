@@ -1,0 +1,31 @@
+name: Deploy to Heroku
+
+on:
+  push:
+    branches:
+      - main  # Set a branch name for deployment
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Heroku
+      run: curl https://cli-assets.heroku.com/install.sh | sh
+
+    - name: Login to Heroku Container Registry
+      run: heroku container:login
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
+    - name: Build and push Docker image to Heroku
+      run: heroku container:push web --app hdc-nextjs
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+
+    - name: Release Docker image to Heroku
+      run: heroku container:release web --app hdc-nextjs
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
